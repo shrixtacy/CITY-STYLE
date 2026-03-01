@@ -18,7 +18,12 @@ const AUTH_ERRORS = {
 };
 
 const getErrorMessage = (error) => {
-  return AUTH_ERRORS[error.code] || 'Something went wrong. Please try again.';
+  // If it's a known Firebase error, return friendly message
+  if (AUTH_ERRORS[error.code]) {
+      return AUTH_ERRORS[error.code];
+  }
+  // Otherwise return the backend/standard error message
+  return error.message || 'Something went wrong. Please try again.';
 };
 
 /* ──────────────────────────────────────────────
@@ -48,6 +53,8 @@ const Auth = () => {
   const [resetEmail, setResetEmail] = useState('');
   const [resetMessage, setResetMessage] = useState('');
 
+  const [successMessage, setSuccessMessage] = useState('');
+
   /* ── Helpers ────────────────────────────────── */
   const clearForm = () => {
     setFullName('');
@@ -56,6 +63,7 @@ const Auth = () => {
     setConfirmPassword('');
     setError('');
     setShowPassword(false);
+    setSuccessMessage('');
   };
 
   const switchMode = () => {
@@ -99,6 +107,7 @@ const Auth = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage('');
 
     if (!validateForm()) return;
 
@@ -299,6 +308,8 @@ const Auth = () => {
 
           {/* Error Message */}
           {error && <p className="error-message">{error}</p>}
+          {/* Success Message */}
+          {successMessage && <p className="success-message" style={{color: 'green', margin: '10px 0'}}>{successMessage}</p>}
 
           {/* Submit Button */}
           <button type="submit" className="login-btn" disabled={loading}>
